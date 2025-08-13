@@ -21,7 +21,7 @@ export default async function RootLayout({ children }) {
     }}>
       <html lang="en" suppressHydrationWarning >
         <body
-          className={`${inter.className} `} style={{overflow:"auto"}}
+          className={`${inter.className} `} style={{overflow:"scroll"}}
         >
           <ThemeProvider
             attribute="class"
