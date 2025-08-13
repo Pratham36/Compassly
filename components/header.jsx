@@ -13,7 +13,7 @@ export default async function Header() {
   const check=await checkUser();
   const isSignedIn=checkUser!==null;
   return (
-    <header className='flexed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60 ' >
+    <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60 ' >
       <nav className='container mx-auto px-4 h-16 flex items-center justify-between '>
         <Link href={!isSignedIn?"/":"/dashboard"}>
           <p className=" logo font-bold gradient-title animate-gradient h-12 py-1 pt-3 w-auto object-contain text-xl md:text-2xl lg:text-3xl" >
