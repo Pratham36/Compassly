@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Autour_One, Inter } from "next/font/google";
 import "./globals.css";
