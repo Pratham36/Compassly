@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Toaster } from "@/components/ui/sonner";
-
+import { BodyScrollFix } from "@/components/body-scroll-fix";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -14,6 +14,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
+
   return (
 
     <ClerkProvider appearance={{
@@ -21,8 +22,9 @@ export default async function RootLayout({ children }) {
     }}>
       <html lang="en" suppressHydrationWarning >
         <body
-          className={`${inter.className} `} style={{overflow:"scroll"}}
+          className={`${inter.className} `} style={{ overflow: "scroll" }}
         >
+          <BodyScrollFix />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -34,7 +36,7 @@ export default async function RootLayout({ children }) {
 
 
             <main className="min-h-screen">{children}</main>
-               < Toaster richColors />
+            < Toaster richColors />
             {/* Footer */}
             <footer className="bg-muted">
               <div className="container mx-auto py-4 text-center text-gray-200">
