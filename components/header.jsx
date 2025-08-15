@@ -10,12 +10,12 @@ import { FileUser, GraduationCap, LayoutDashboard, Menu, PenBox } from 'lucide-r
 import { checkUser } from '@/lib/checkUser'
 
 export default async function Header() {
-  const check=await checkUser();
-  const isSignedIn=checkUser!==null;
+  const check = await checkUser();
+  const isSignedIn = checkUser !== null;
   return (
     <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60 ' >
       <nav className='container mx-auto px-4 h-16 flex items-center justify-between '>
-        <Link href={!isSignedIn?"/":"/dashboard"}>
+        <Link href={!isSignedIn ? "/" : "/dashboard"}>
           <p className=" logo font-bold gradient-title animate-gradient h-12 py-1 pt-3 w-auto object-contain text-xl md:text-2xl lg:text-3xl" >
             COMPASSLY
           </p>
@@ -38,25 +38,28 @@ export default async function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Link href={"/resume"} className='flex items-center gap-2'>
-                    <FileUser className='h-4 w-4' />
-                    <span className=' md:block'>Resume Builder</span>
+                <DropdownMenuItem asChild>
+                  <Link href="/resume" className="flex items-center gap-2">
+                    <FileUser className="h-4 w-4" />
+                    <span className="md:block">Resume Builder</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href={"/ai-cover-letter"} className='flex items-center gap-2'>
-                    <PenBox className='h-4 w-4' />
-                    <span className=' md:block'>Cover Letter</span>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/ai-cover-letter" className="flex items-center gap-2">
+                    <PenBox className="h-4 w-4" />
+                    <span className="md:block">Cover Letter</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href={"/interview"} className='flex items-center gap-2'>
-                    <GraduationCap className='h-4 w-4' />
-                    <span className=' md:block'>Interview Perp</span>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/interview" className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4" />
+                    <span className="md:block">Interview Prep</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
+
             </DropdownMenu>
           </SignedIn>
 
