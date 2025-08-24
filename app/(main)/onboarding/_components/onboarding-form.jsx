@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";   // ✅ import router
+import { useRouter } from "next/navigation";
 import { Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadResume } from "@/actions/resume";
@@ -11,17 +11,27 @@ export default function ResumeUpload() {
   const [file, setFile] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // ✅ initialize router
+  const router = useRouter();
 
+  // Handle file selection with size limit
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    const MAX_SIZE_MB = 5; // temporary size limit (10MB)
+
+    if (selectedFile && selectedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+      toast.error(`File too large! Max ${MAX_SIZE_MB}MB allowed.`);
+      return;
+    }
+
     if (selectedFile && selectedFile.type !== "application/pdf") {
       toast.error("Please upload a PDF file only.");
       return;
     }
+
     setFile(selectedFile);
   };
 
+  // Handle upload
   const handleUpload = async () => {
     if (!file) {
       toast.warning("Please select a file first!");
@@ -57,7 +67,7 @@ export default function ResumeUpload() {
       toast.success("Resume uploaded & analyzed successfully!");
       setIsOpen(false);
 
-      // ✅ redirect to dashboard
+      // Redirect to dashboard
       router.push("/dashboard");
       router.refresh(); // optional, ensures latest data shows up
     } catch (err) {
