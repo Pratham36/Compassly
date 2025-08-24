@@ -16,7 +16,7 @@ export default function ResumeUpload() {
   // Handle file selection with size limit
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const MAX_SIZE_MB = 5; // temporary size limit (10MB)
+    const MAX_SIZE_MB = 2; // temporary size limit (10MB)
 
     if (selectedFile && selectedFile.size > MAX_SIZE_MB * 1024 * 1024) {
       toast.error(`File too large! Max ${MAX_SIZE_MB}MB allowed.`);
