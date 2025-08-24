@@ -16,7 +16,7 @@ export default function ResumeUpload() {
   // Handle file selection with size limit
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const MAX_SIZE_MB = 2; // temporary size limit (10MB)
+    const MAX_SIZE_MB = 1; // temporary size limit (10MB)
 
     if (selectedFile && selectedFile.size > MAX_SIZE_MB * 1024 * 1024) {
       toast.error(`File too large! Max ${MAX_SIZE_MB}MB allowed.`);
@@ -84,7 +84,7 @@ export default function ResumeUpload() {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90 p-4">
       <div className="bg-[#1e1e1e] text-white rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg p-6 relative">
         <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">
-          Upload Resume (PDF)<span className="text-sm text-red-500"> Max 2Mb</span>
+          Upload Resume (PDF)<span className="text-sm text-red-500"> Max 1Mb</span>
         </h2>
 
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 cursor-pointer hover:bg-[#2a2a2a] transition text-center">
