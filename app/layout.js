@@ -27,9 +27,9 @@ export default async function RootLayout({ children }) {
           <BodyScrollFix />
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+            defaultTheme="dark"
+            enableSystem={false} 
+            
           >
             {/* Header */}
             <Header />

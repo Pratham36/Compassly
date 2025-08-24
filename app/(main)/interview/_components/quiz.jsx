@@ -15,7 +15,9 @@ import { Label } from "@/components/ui/label";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
-import { BarLoader } from "react-spinners";
+import { RotateLoader } from "react-spinners";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -85,7 +87,13 @@ export default function Quiz() {
   };
 
   if (generatingQuiz) {
-    return <BarLoader className="mt-4" width={"100%"} color="gray" />;
+    return (
+    <div className="min-h-screen w-full flex flex-col px-5">
+          <div className="flex flex-1 items-center justify-center w-full">
+            <RotateLoader size={20} margin={20} color="gray" />
+          </div>
+    </div>
+  );
   }
 
   // Show results if quiz is completed
@@ -165,7 +173,7 @@ export default function Quiz() {
           className="ml-auto"
         >
           {savingResult && (
-            <BarLoader className="mt-4" width={"100%"} color="gray" />
+              <Loader2 className="w-4 h-4 animate-spin" />
           )}
           {currentQuestion < quizData.length - 1
             ? "Next Question"

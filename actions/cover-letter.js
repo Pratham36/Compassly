@@ -13,35 +13,45 @@ export async function generateCoverLetter(data) {
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
+    include: { resume: true },
   });
 
   if (!user) throw new Error("User not found");
+  if (!user.resume) throw new Error("Resume not uploaded");
 
-  const prompt = `
-    Write a professional cover letter for a ${data.jobTitle} position at ${
-    data.companyName
-  }.
-    
-    About the candidate:
-    - Industry: ${user.industry}
-    - Years of Experience: ${user.experience}
-    - Skills: ${user.skills?.join(", ")}
-    - Professional Background: ${user.bio}
-    
-    Job Description:
-    ${data.jobDescription}
-    
-    Requirements:
-    1. Use a professional, enthusiastic tone
-    2. Highlight relevant skills and experience
-    3. Show understanding of the company's needs
-    4. Keep it concise (max 400 words)
-    5. Use proper business letter formatting in markdown
-    6. Include specific examples of achievements
-    7. Relate candidate's background to job requirements
-    
-    Format the letter in markdown.
-  `;
+  // Parse resume JSON
+  const resume = JSON.parse(user.resume.content);
+
+const prompt = `
+Write a professional cover letter for the ${data.jobTitle} position at ${data.companyName}.
+
+Header:
+${resume.name || ""}
+${resume.email || ""}
+${resume.phone || ""}
+
+Candidate Information (from resume):
+${resume.education?.length ? "- Education: " + resume.education.join("; ") : ""}
+${resume.experience?.length ? "- Experience: " + resume.experience.join("; ") : ""}
+${resume.skills?.length ? "- Skills: " + resume.skills.join(", ") : ""}
+${resume.projects?.length ? "- Projects: " + resume.projects.join("; ") : ""}
+${resume.languages?.length ? "- Languages: " + resume.languages.join(", ") : ""}
+
+Job Description:
+${data.jobDescription}
+
+Requirements:
+1. Use a professional, enthusiastic tone
+2. Highlight relevant skills and experience
+3. Show understanding of the company's needs
+4. Keep it concise (max 400 words)
+5. Use proper business letter formatting in markdown
+6. Include specific examples of achievements or projects
+7. Relate candidate's background to job requirements
+
+Format the letter in markdown. Do not insert placeholder text like [Your Name] or [Your Address].
+`;
+
 
   try {
     const result = await model.generateContent(prompt);
@@ -64,6 +74,7 @@ export async function generateCoverLetter(data) {
     throw new Error("Failed to generate cover letter");
   }
 }
+
 
 export async function getCoverLetters() {
   const { userId } = await auth();

@@ -82,6 +82,7 @@ body {
   }
 }
 
+
 .logo {
   font-family: "Press Start 2P", system-ui;
   font-weight: 400;
@@ -150,3 +151,8 @@ body {
     letter-spacing: 2px;
   }
 }
+/* globals.css */
+.my-x-axis-labels {
+  @apply hidden sm:text-[8px] md:text-[8px] lg:text-[12px] xl:text-[15px] sm:inline;
+}
+

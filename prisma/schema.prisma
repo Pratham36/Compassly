@@ -17,16 +17,12 @@ model User {
   industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+ isUploaded    Boolean   @default(false)
 
-  // Profile fields
-  bio           String?
-  experience    Int?      // Years of experience
-  
-  // Relations
-  skills        String[]  // Array of skills
   assessments   Assessment[]
   resume        Resume?
   coverLetter   CoverLetter[]
+  resumeAnalysis ResumeAnalysis?
 }
 
 model Assessment {
@@ -42,14 +38,44 @@ model Assessment {
 
   @@index([userId])
 }
+model ResumeAnalysis {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+
+  // Overall evaluation
+  overallScore    Float
+  overallFeedback String
+  summaryComment  String
+
+  // Section-wise scores
+  contactScore    Float
+  experienceScore Float
+  educationScore  Float
+  skillsScore     Float
+
+  // Highlights
+  tipsForImprovement String[]
+  whatsGood          String[]
+  needsImprovement   String[]
+
+  // ATS-specific analysis
+  atsScore        Float    // Applicant Tracking System score (0–100)
+  atsComment      String
+  keywordMatches  String[]
+  keywordGaps     String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 model Resume {
   id          String    @id @default(cuid())
   userId      String    @unique    // One resume per user
   user        User      @relation(fields: [userId], references: [id])
   content     String    @db.Text // Markdown content
-  atsScore    Float?
-  feedback    String?
+  filename String?
+   fileUrl String? // store cloud storage URL
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }

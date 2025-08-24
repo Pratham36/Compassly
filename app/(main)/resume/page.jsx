@@ -1,12 +1,12 @@
-import { getResume } from "@/actions/resume";
-import ResumeBuilder from "./_components/resume-builder";
+import { getResumeAnalysis } from "@/actions/resume-analysis";
+import ResumeAnalysis  from "./_components/resume-analysis ";
 
 export default async function ResumePage() {
-  const resume = await getResume();
+ const resume = await getResumeAnalysis();
 
   return (
-    <div className="container mx-auto py-6">
-      <ResumeBuilder initialContent={resume?.content} />
+    <div className="container mx-auto">
+      <ResumeAnalysis  data={resume}/>
     </div>
   );
 }

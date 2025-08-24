@@ -1,203 +1,102 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { useState } from "react";
+import { useRouter } from "next/navigation";   // ✅ import router
+import { Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import useFetch from "@/hooks/use-fetch";
-import { onboardingSchema } from "@/app/lib/schema";
-import { updateUser } from "@/actions/user";
+import { uploadResume } from "@/actions/resume";
+import { toast } from "sonner";
 
-const OnboardingForm = ({ industries }) => {
-    const router = useRouter();
-    const [selectedIndustry, setSelectedIndustry] = useState(null);
+export default function ResumeUpload() {
+  const [file, setFile] = useState(null);
+  const [isOpen, setIsOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter(); // ✅ initialize router
 
-    const {
-        loading: updateLoading,
-        fn: updateUserFn,
-        data: updateResult,
-    } = useFetch(updateUser);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type !== "application/pdf") {
+      toast.error("Please upload a PDF file only.");
+      return;
+    }
+    setFile(selectedFile);
+  };
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        watch,
-    } = useForm({
-        resolver: zodResolver(onboardingSchema),
-    });
+  const handleUpload = async () => {
+    if (!file) {
+      toast.warning("Please select a file first!");
+      return;
+    }
 
-    const onSubmit = async (values) => {
-  try {
-    const formattedIndustry = `${values.industry}-${values.subIndustry
-      .toLowerCase()
-      .replace(/ /g, "-")}`;
+    setLoading(true);
 
-    await updateUserFn({
-      ...values,
-      industry: formattedIndustry,
-    });
+    try {
+      const formData = new FormData();
+      formData.append("resume", file);
 
-    // toast.success("🎉 Profile submitted successfully!");
-  } catch (error) {
-    // toast.error("😢 Something went wrong: " + error?.message);
-  }
-};
+      let attempts = 0;
+      let result;
 
- useEffect(() => {
-  if (updateResult?.success && !updateLoading) {
-    toast.success("Profile completed successfully!");
+      while (attempts < 3) {
+        attempts++;
+        result = await uploadResume(formData);
+
+        if (result.success) break;
+
+        if (result.error.includes("Too Many Requests")) {
+          toast.info(`Server busy, retrying... (${attempts}/3)`);
+          await new Promise((r) => setTimeout(r, attempts * 1000));
+          continue;
+        }
+
+        throw new Error(result.error);
+      }
+
+      if (!result?.success) throw new Error(result.error);
+
+      toast.success("Resume uploaded & analyzed successfully!");
+      setIsOpen(false);
+
+      // ✅ redirect to dashboard
       router.push("/dashboard");
-      router.refresh();
-  }
-}, [updateResult, updateLoading]);
+      router.refresh(); // optional, ensures latest data shows up
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (!isOpen) return null;
 
-    const watchIndustry = watch("industry");
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90 p-4">
+      <div className="bg-[#1e1e1e] text-white rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg p-6 relative">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">
+          Upload Resume (PDF)
+        </h2>
 
-    return (
-        <div className="flex items-center justify-center bg-background">
-            <Card className="w-full max-w-lg mt-10 mx-2">
-                <CardHeader>
-                    <CardTitle className="gradient-title text-4xl">
-                        Complete Your Profile
-                    </CardTitle>
-                    <CardDescription>
-                        Select your industry to get personalized career insights and
-                        recommendations.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="industry">Industry</Label>
-                            <Select
-                                onValueChange={(value) => {
-                                    setValue("industry", value);
-                                    setSelectedIndustry(
-                                        industries.find((ind) => ind.id === value)
-                                    );
-                                    setValue("subIndustry", "");
-                                }}
-                            >
-                                <SelectTrigger id=" industry " className="w-full">
-                                    <SelectValue placeholder="Select an industry" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Industries</SelectLabel>
-                                        {industries.map((ind) => (
-                                            <SelectItem key={ind.id} value={ind.id}>
-                                                {ind.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            {errors.subIndustry && (
-                                <p className="text-sm text-red-500">
-                                    {errors.subIndustry.message}
-                                </p>
-                            )}
-                        </div>
-                        {watchIndustry && (
-                            <div className="space-y-2 ">
-                                <Label htmlFor="subIndustry">Specialization</Label>
-                                <Select
-                                    onValueChange={(value) => setValue("subIndustry", value)}
-                                >
-                                    <SelectTrigger id="subIndustry" className="w-full">
-                                        <SelectValue placeholder="Select your specialization" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Specializations</SelectLabel>
-                                            {selectedIndustry?.subIndustries.map((sub) => (
-                                                <SelectItem key={sub} value={sub}>
-                                                    {sub}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                                {errors.subIndustry && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.subIndustry.message}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                        <div className="space-y-2">
-                            <Label htmlFor="experience">Years of Experience</Label>
-                            <Input
-                                id="experience"
-                                type="number"
-                                min="0"
-                                max="50"
-                                placeholder="Enter years of experience"
-                                {...register("experience")}
-                            />
-                            {errors.experience && (
-                                <p className="text-sm text-red-500">
-                                    {errors.experience.message}
-                                </p>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="skills">Skills</Label>
-                            <Input
-                                id="skills"
-                                placeholder="e.g., Python, JavaScript, Project Management"
-                                {...register("skills")}
-                            />
-                            <p className="text-sm text-muted-foreground">
-                                Separate multiple skills with commas
-                            </p>
-                            {errors.skills && (
-                                <p className="text-sm text-red-500">{errors.skills.message}</p>
-                            )}
-                        </div>
+        <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 cursor-pointer hover:bg-[#2a2a2a] transition text-center">
+          <FileText size={40} className="text-gray-400 mb-2" />
+          <span className="text-gray-400">
+            {file ? file.name : "Click to select a PDF"}
+          </span>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </label>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="bio">Professional Bio</Label>
-                            <Textarea
-                                id="bio"
-                                placeholder="Tell us about your professional background..."
-                                className="h-32"
-                                {...register("bio")}
-                            />
-                            {errors.bio && (
-                                <p className="text-sm text-red-500">{errors.bio.message}</p>
-                            )}
-                        </div>
-
-                        <Button type="submit" className="w-full" disabled={updateLoading}>
-                            {updateLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Saving...
-                                </>
-                            ) : (
-                                "Complete Profile"
-                            )}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-           
-           
+        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+          <Button onClick={handleUpload} disabled={!file || loading}>
+            <Upload size={18} className="mr-2" />
+            {loading ? "Uploading..." : "Upload & Analyze"}
+          </Button>
         </div>
-    );
-};
-
-export default OnboardingForm;
+      </div>
+    </div>
+  );
+}

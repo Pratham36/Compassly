@@ -6,7 +6,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button'
-import { FileUser, GraduationCap, LayoutDashboard, Menu, PenBox } from 'lucide-react'
+import { FileUser, GraduationCap, LayoutDashboard, Menu, PenBox, ScanText } from 'lucide-react'
 import { checkUser } from '@/lib/checkUser'
 
 export default async function Header() {
@@ -15,7 +15,7 @@ export default async function Header() {
   return (
     <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60 ' >
       <nav className='container mx-auto px-4 h-16 flex items-center justify-between '>
-        <Link href={!isSignedIn ? "/" : "/dashboard"}>
+        <Link href={!isSignedIn ? "/" : "/onboarding"}>
           <p className=" logo font-bold gradient-title animate-gradient h-12 py-1 pt-3 w-auto object-contain text-xl md:text-2xl lg:text-3xl" >
             COMPASSLY
           </p>
@@ -40,8 +40,8 @@ export default async function Header() {
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
                   <Link href="/resume" className="flex items-center gap-2">
-                    <FileUser className="h-4 w-4" />
-                    <span className="md:block">Resume Builder</span>
+                    <ScanText  className="h-4 w-4" />
+                    <span className="md:block">Resume Analysis</span>
                   </Link>
                 </DropdownMenuItem>
 
@@ -73,6 +73,7 @@ export default async function Header() {
                   userButtonTrigger: "hover:scale-105 transition-transform duration-200",
                 },
               }}
+              afterSignInUrl="/dashboard"
               afterSignOutUrl="/"
             />
           </SignedIn>

@@ -46,9 +46,7 @@ export async function updateUser(data) {
           },
           data: {
             industry: data.industry,
-            experience: data.experience,
-            bio: data.bio,
-            skills: data.skills,
+           
           },
         });
 
@@ -82,13 +80,11 @@ export async function getUserOnboardingStatus() {
       where: {
         clerkUserId: userId,
       },
-      select: {
-        industry: true,
-      },
+
     });
 
     return {
-      isOnboarded: !!user?.industry,
+      isOnboarded: !!user?.isUploaded,
     };
   } catch (error) {
     console.error("Error checking onboarding status:", error);

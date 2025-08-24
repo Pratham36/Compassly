@@ -11,26 +11,37 @@ export async function generateQuiz() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
+  // ✅ Fetch resume data
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
-    select: {
-      industry: true,
-      skills: true,
-    },
+    select: { resume: true },
   });
 
   if (!user) throw new Error("User not found");
 
+  const { resume } = user;
+
+  // 📝 Prompt tuned to use resume context
   const prompt = `
-    Generate 10 technical interview questions for a ${
-      user.industry
-    } professional${
-    user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
-  }.
-    
-    Each question should be multiple choice with 4 options.
-    
-    Return the response in this JSON format only, no additional text:
+    You are an expert interviewer and trainer.  
+    Generate **10 multiple-choice technical interview questions** strictly based on this user's resume:
+
+    Resume Content:
+    """ 
+    ${resume || "No resume available"} 
+    """
+
+    ✅ Rules:
+    - Each question should be directly related to skills, projects, or technologies mentioned in the resume.
+    - If resume lacks details, fallback to general technical questions in the user's domain.
+    - Each question must include:
+      • Question text  
+      • 4 options (A, B, C, D)  
+      • Correct answer (just the option text, not letter)  
+      • A short explanation (1-2 sentences)  
+
+    ✅ Output:
+    Return only valid JSON in this format:
     {
       "questions": [
         {
@@ -45,8 +56,7 @@ export async function generateQuiz() {
 
   try {
     const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const text = result.response.text();
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
     const quiz = JSON.parse(cleanedText);
 
@@ -75,38 +85,31 @@ export async function saveQuizResult(questions, answers, score) {
     explanation: q.explanation,
   }));
 
-  // Get wrong answers
   const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
 
-  // Only generate improvement tips if there are wrong answers
   let improvementTip = null;
   if (wrongAnswers.length > 0) {
     const wrongQuestionsText = wrongAnswers
       .map(
         (q) =>
-          `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer: "${q.userAnswer}"`
+          `Q: "${q.question}"\nCorrect: "${q.answer}"\nUser: "${q.userAnswer}"`
       )
       .join("\n\n");
 
     const improvementPrompt = `
-      The user got the following ${user.industry} technical interview questions wrong:
+      The user got the following questions wrong:
 
       ${wrongQuestionsText}
 
-      Based on these mistakes, provide a concise, specific improvement tip.
-      Focus on the knowledge gaps revealed by these wrong answers.
-      Keep the response under 2 sentences and make it encouraging.
-      Don't explicitly mention the mistakes, instead focus on what to learn/practice.
+      Based on these mistakes, provide 1-2 very specific improvement tips.
+      Keep them short, actionable, and encouraging.
     `;
 
     try {
       const tipResult = await model.generateContent(improvementPrompt);
-
       improvementTip = tipResult.response.text().trim();
-      console.log(improvementTip);
     } catch (error) {
       console.error("Error generating improvement tip:", error);
-      // Continue without improvement tip if generation fails
     }
   }
 
@@ -140,12 +143,8 @@ export async function getAssessments() {
 
   try {
     const assessments = await db.assessment.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
+      where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
     });
 
     return assessments;

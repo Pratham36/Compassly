@@ -1,10 +1,30 @@
 "use client";
 
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, } from "recharts";
-import { BriefcaseIcon, LineChart, TrendingUp, TrendingDown, Brain, } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  BriefcaseIcon,
+  LineChart,
+  TrendingUp,
+  TrendingDown,
+  Brain,
+} from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
@@ -55,6 +75,7 @@ const DashboardView = ({ insights }) => {
 
   return (
     <div className="space-y-6">
+       <h1 className="text-6xl font-bold gradient-title">Industry Insights</h1>
       <div className="flex justify-between items-center">
         <Badge variant="outline">Last updated: {lastUpdatedDate}</Badge>
       </div>
@@ -136,8 +157,10 @@ const DashboardView = ({ insights }) => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={salaryData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis
+                  dataKey="name"
+                  tick={{ className: "my-x-axis-labels" }}
+                />                <YAxis />
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
