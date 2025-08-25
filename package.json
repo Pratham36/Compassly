@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev --turbopack",
+    "dev": "prisma generate && next dev --turbopack && NODE_OPTIONS=--openssl-legacy-provider next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "fix":"npx prisma migrate reset && npx prisma migrate dev "
+    "fix": "npx prisma migrate reset && npx prisma migrate dev ",
+    "resetDatabase": "npx prisma migrate reset"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.25.4",
@@ -31,6 +32,7 @@
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "googleapis": "^157.0.0",
     "html2pdf": "^0.0.11",
     "html2pdf.js": "^0.10.3",
     "inngest": "^3.40.1",
