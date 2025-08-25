@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadResume } from "@/actions/resume"; // server action
@@ -14,7 +13,10 @@ export default function ResumeUpload() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-
+ const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+  };
 
   // ✅ Upload handling
   const handleUpload = async () => {
@@ -69,6 +71,7 @@ export default function ResumeUpload() {
       <div className="bg-[#1e1e1e] text-white rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg p-6 relative">
         <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">
           Upload Resume (PDF)
+         
         </h2>
 
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 cursor-pointer hover:bg-[#2a2a2a] transition text-center">
@@ -77,6 +80,7 @@ export default function ResumeUpload() {
             {file ? file.name : "Click to select a PDF"}
           </span>
           <input
+          onChange={handleFileChange}
             type="file"
             accept=".pdf"
             className="hidden"
