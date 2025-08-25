@@ -1,27 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";   // ✅ import router
+import { useRouter } from "next/navigation";
 import { Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { uploadResume } from "@/actions/resume";
+import { uploadResume } from "@/actions/resume"; // server action
 import { toast } from "sonner";
 
 export default function ResumeUpload() {
   const [file, setFile] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // ✅ initialize router
+  const router = useRouter();
 
-  const handleFileChange = (e) => {
+ const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type !== "application/pdf") {
-      toast.error("Please upload a PDF file only.");
-      return;
-    }
     setFile(selectedFile);
   };
 
+  // ✅ Upload handling
   const handleUpload = async () => {
     if (!file) {
       toast.warning("Please select a file first!");
@@ -56,10 +53,8 @@ export default function ResumeUpload() {
 
       toast.success("Resume uploaded & analyzed successfully!");
       setIsOpen(false);
-
-      // ✅ redirect to dashboard
       router.push("/dashboard");
-      router.refresh(); // optional, ensures latest data shows up
+      router.refresh();
     } catch (err) {
       console.error(err);
       toast.error(err.message);
@@ -70,11 +65,13 @@ export default function ResumeUpload() {
 
   if (!isOpen) return null;
 
+  // ✅ JSX Rendering
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90 p-4">
       <div className="bg-[#1e1e1e] text-white rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg p-6 relative">
         <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">
           Upload Resume (PDF)
+         
         </h2>
 
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 cursor-pointer hover:bg-[#2a2a2a] transition text-center">
@@ -83,9 +80,9 @@ export default function ResumeUpload() {
             {file ? file.name : "Click to select a PDF"}
           </span>
           <input
+          onChange={handleFileChange}
             type="file"
             accept=".pdf"
-            onChange={handleFileChange}
             className="hidden"
           />
         </label>

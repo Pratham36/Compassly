@@ -3,10 +3,14 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterList from "./_components/cover-letter-list";
+import { getUserOnboardingStatus } from "@/actions/user";
 
 export default async function CoverLetterPage() {
   const coverLetters = await getCoverLetters();
-
+  const { isOnboarded } = await getUserOnboardingStatus();
+  if (!isOnboarded) {
+    redirect("/onboarding");
+  }
   return (
     <div>
       <div className="flex flex-col md:flex-row gap-2 items-center justify-between mb-5">
